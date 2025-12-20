@@ -1,0 +1,37 @@
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Plugin generated
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+Plugins/*/Saved/
+
+# IDEs
+.vscode/
+.vs/
+.idea/
+*.iml
+
+# Visual Studio / Rider
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+
+# Logs & crash reports
+*.log
+CrashReportClient/
+
+# OS junk
+.DS_Store
+Thumbs.db
