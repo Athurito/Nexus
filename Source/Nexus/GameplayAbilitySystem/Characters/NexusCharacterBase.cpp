@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Nexus/GameplayAbilitySystem/AttributeSets/BasicAttributeSet.h"
 
 // Sets default values
 ANexusCharacterBase::ANexusCharacterBase()
@@ -17,6 +18,9 @@ ANexusCharacterBase::ANexusCharacterBase()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(AscReplicationMode);
+	
+	//Add AttributeSet
+	BasicAttributeSet = CreateDefaultSubobject<UBasicAttributeSet>(TEXT("BasicAttributeSet"));
 	
 	//Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.0f);

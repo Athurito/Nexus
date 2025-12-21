@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "NexusCharacterBase.generated.h"
 
+class UBasicAttributeSet;
+
 UCLASS()
 class NEXUS_API ANexusCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -20,6 +22,9 @@ public:
 	//AbilitySystemComponent
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	UAbilitySystemComponent* AbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UBasicAttributeSet* BasicAttributeSet;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilitySystem")
