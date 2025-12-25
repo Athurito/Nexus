@@ -3,6 +3,7 @@
 
 #include "NexusCharacterBase.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -55,6 +56,7 @@ void ANexusCharacterBase::PossessedBy(AController* NewController)
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		GrandAbilities(StartingAbilities);
 	}
 }
 
@@ -84,5 +86,39 @@ void ANexusCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInput
 UAbilitySystemComponent* ANexusCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+TArray<FGameplayAbilitySpecHandle> ANexusCharacterBase::GrandAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGrant)
+{
+	if (!AbilitySystemComponent || !HasAuthority()) return {};
+	
+	TArray<FGameplayAbilitySpecHandle> SpecHandles;
+	for (auto Ability : AbilitiesToGrant)
+	{
+		SpecHandles.Add(AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, -1, this)));
+	}
+	
+	SendAbilitiesChangedEvent();
+	return SpecHandles;
+}
+
+void ANexusCharacterBase::RemoveAbilities(TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove)
+{
+	if (!AbilitySystemComponent || !HasAuthority()) return;
+	
+	for (auto Ability : AbilitiesToRemove)
+	{
+		AbilitySystemComponent->ClearAbility(Ability);
+	}
+	SendAbilitiesChangedEvent();
+}
+
+void ANexusCharacterBase::SendAbilitiesChangedEvent()
+{
+	FGameplayEventData EventData;
+	EventData.EventTag = FGameplayTag::RequestGameplayTag("Event.Abilities.Changed");
+	EventData.Instigator = this;
+	EventData.Target = this;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, EventData.EventTag, EventData);
 }
 
