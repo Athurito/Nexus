@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Nexus/GameplayAbilitySystem/NexusAbilitySystemComponent.h"
 #include "Nexus/GameplayAbilitySystem/AttributeSets/BasicAttributeSet.h"
 
 // Sets default values
@@ -16,7 +17,7 @@ ANexusCharacterBase::ANexusCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	//Add AbilitySystemComponent
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UNexusAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(AscReplicationMode);
 	
