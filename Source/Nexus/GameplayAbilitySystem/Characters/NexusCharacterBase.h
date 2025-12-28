@@ -37,7 +37,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
-
+	virtual void OnDeadTagChanged(const FGameplayTag Tag, int32 NewCount);
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "Damage")
+	void HandleDeath();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

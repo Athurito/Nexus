@@ -7,4 +7,5 @@ UNexusGameplayAbility::UNexusGameplayAbility()
 {
 	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("GameplayAbility.Active"));
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("State.Dead"));
 }
