@@ -9,3 +9,11 @@ UNexusGameplayAbility::UNexusGameplayAbility()
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("State.Dead"));
 }
+
+bool UNexusGameplayAbility::HasPC() const
+{
+	const APawn* PawnObject = Cast<APawn>(GetAvatarActorFromActorInfo());
+	if (!PawnObject) return false;
+	
+	return PawnObject->IsPlayerControlled();
+}
