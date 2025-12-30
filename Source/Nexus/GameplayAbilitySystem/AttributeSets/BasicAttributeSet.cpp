@@ -12,6 +12,9 @@ UBasicAttributeSet::UBasicAttributeSet()
 	MaxHealth = 100.0f;
 	Stamina = 100.0f;
 	MaxStamina = 100.0f;
+	Shield = 0.0f;
+	MaxShield = 100.0f;
+	Damage = 0.0f;
 }
 
 void UBasicAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue) const
@@ -34,6 +37,16 @@ void UBasicAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldValue
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBasicAttributeSet, MaxStamina, OldValue);
 }
 
+void UBasicAttributeSet::OnRep_Shield(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBasicAttributeSet, Shield, OldValue);
+}
+
+void UBasicAttributeSet::OnRep_MaxShield(const FGameplayAttributeData& OldValue) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBasicAttributeSet, MaxShield, OldValue);
+}
+
 void UBasicAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -42,6 +55,8 @@ void UBasicAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME_CONDITION_NOTIFY(UBasicAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBasicAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBasicAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBasicAttributeSet, Shield, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBasicAttributeSet, MaxShield, COND_None, REPNOTIFY_Always);
 }
 
 void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -57,15 +72,37 @@ void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
 	}
+	
+	if (Attribute == GetShieldAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxShield());
+	}
 }
 
 void UBasicAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 	
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		SetHealth(GetHealth());
+		float TotalDamage = GetDamage();
+		SetDamage(0.f);
+		
+		float CurrentShield = GetShield();
+		
+		if (CurrentShield > 0.0f)
+		{
+			SetShield(CurrentShield - TotalDamage);
+			float RemainingDamage = TotalDamage - CurrentShield;
+			if (RemainingDamage > 0.0f)
+			{
+				SetHealth(GetHealth() - RemainingDamage);
+			}
+		}
+		else
+		{
+			SetHealth(GetHealth() - TotalDamage);
+		}
 		
 		if (Data.EffectSpec.Def->GetAssetTags().HasTag(FGameplayTag::RequestGameplayTag("Effects.HitReaction")) && Data.EvaluatedData.Magnitude != 0.0f)
 		{
@@ -73,6 +110,13 @@ void UBasicAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectM
 			HitReactionTagContainer.AddTag(FGameplayTag::RequestGameplayTag("GameplayAbility.HitReaction"));
 			GetOwningAbilitySystemComponent()->TryActivateAbilitiesByTag(HitReactionTagContainer);
 		}
+	}
+	
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(GetHealth());
+		
+		
 	}
 	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
 	{
