@@ -134,4 +134,17 @@ void UBasicAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 		DeathAbilityTagContainer.AddTag(FGameplayTag::RequestGameplayTag("GameplayAbility.Death"));
 		GetOwningAbilitySystemComponent()->TryActivateAbilitiesByTag(DeathAbilityTagContainer);
 	}
+	
+	if (Attribute == GetShieldAttribute())
+	{
+		if (NewValue > 0 && OldValue <= 0.f)
+		{
+			GetOwningAbilitySystemComponent()->AddGameplayCue( FGameplayTag::RequestGameplayTag("GameplayCue.ShieldUp"));
+		}
+		else if (NewValue <= 0.f && OldValue > 0.f)
+		{
+			GetOwningAbilitySystemComponent()->RemoveGameplayCue( FGameplayTag::RequestGameplayTag("GameplayCue.ShieldUp"));
+			GetOwningAbilitySystemComponent()->ExecuteGameplayCue( FGameplayTag::RequestGameplayTag("GameplayCue.ShieldDown"));
+		}
+	}
 }
